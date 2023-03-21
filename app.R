@@ -7,6 +7,10 @@ library(readr)
 library(mime)
 library(reactable)
 library(highcharter)
+library(htmltools)
+library(shinyWidgets)
+
+# hchart(mtcars, type="point", hcaes(x=mpg, y=cyl,color=hp,group=gear,variable=carb), name = "carb",dataLabels = list(enabled = F))
 
 csvFileServer <- function(id, stringsAsFactors) {
   moduleServer(
@@ -85,7 +89,79 @@ ui <- dashboardPage(
         tabItems(
           tabItem(
             tabName = "tab1",
-            
+            tags$table(
+              class='table table-bordered km-table',
+              # border = 5,
+              # tags$thead(
+              #   tags$tr(
+              #     tags$th(colspan = 4, height = 100, width = 800,
+              #             align = "center", "TABLE TITLE")
+              #   )
+              # ),
+              tags$tr(class='w-2',
+                      tags$td(align = "center",class='w-25',
+                              pickerInput(
+                                inputId = "p2",
+                                label = "Select all option / custom text",
+                                choices = rownames(mtcars),
+                                multiple = TRUE,
+                                options = list(
+                                  `actions-box` = TRUE,
+                                  `deselect-all-text` = "None...",
+                                  `select-all-text` = "Yeah, all !",
+                                  `none-selected-text` = "zero"
+                                )
+                              )
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              pickerInput(
+                                inputId = "p2",
+                                label = "Select all option / custom text",
+                                choices = rownames(mtcars),
+                                multiple = TRUE,
+                                options = list(
+                                  `actions-box` = TRUE,
+                                  `deselect-all-text` = "None...",
+                                  `select-all-text` = "Yeah, all !",
+                                  `none-selected-text` = "zero"
+                                )
+                              )
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              pickerInput(
+                                inputId = "p2",
+                                label = "Select all option / custom text",
+                                choices = rownames(mtcars),
+                                multiple = TRUE,
+                                options = list(
+                                  `actions-box` = TRUE,
+                                  `deselect-all-text` = "None...",
+                                  `select-all-text` = "Yeah, all !",
+                                  `none-selected-text` = "zero"
+                                )
+                              )
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              pickerInput(
+                                inputId = "p2",
+                                label = "Select all option / custom text",
+                                choices = rownames(mtcars),
+                                multiple = TRUE,
+                                options = list(
+                                  `actions-box` = TRUE,
+                                  `deselect-all-text` = "None...",
+                                  `select-all-text` = "Yeah, all !",
+                                  `none-selected-text` = "zero"
+                                )
+                              )
+                      )
+                      
+                      # ,tags$tr(
+                      #   tags$td(align = "center", "Data 1"),
+                      #   tags$td(align = "center", "Data 2")
+                      # )
+              )
+            ),
             # box(width = 12,
             # tags$head(
               tags$table(
@@ -137,16 +213,18 @@ ui <- dashboardPage(
             #   )
             # )
               # actionButton(inputId = "controlbarToggle", label = "Toggle Controlbar"),
-              ,box(width = 12,
+          ,fluidRow(
+              box(width = 12,
                   # Simple theme toggle button
                   tags$button(onclick = "document.querySelector('.themeable-tbl').classList.toggle('dark')",
                               "Toggle light/dark"),
                    tags$button("Download as CSV", onclick = "Reactable.downloadDataCSV('cars-table')"),
-                  div(class = "themeable-tbl dark", reactableOutput("reactab"))
+                  div(class = "themeable-tbl light", reactableOutput("reactab"))
                                 
               )
           ,box(width = 12,
                highchartOutput("hc_chart", height = "500px")
+          )
           )
             
           )
@@ -156,7 +234,10 @@ ui <- dashboardPage(
   id = "controlbar",
   collapsed = FALSE,
   overlay = TRUE
-  ,    csvFileUI("datafile", "Data Uploader(.csv)")
+  ,csvFileUI("datafile", "Data Uploader(.csv)")
+  ,uiOutput("selected_row_details")
+  ,verbatimTextOutput("table_state")
+
 
 ),
 title = "updateControlbar"
@@ -180,15 +261,7 @@ server <- function(input, output, session) {
   # observeEvent(input$controlbarToggle, {
   #   updateControlbar(id = "controlbar", session = session)
   # })
-  output$hc_chart <- renderHighchart({
-    # db_hc <-
-    #   db[input$my_dt_rows_selected, ] # filter dataset according to select rows in my_dt
-    db_hc<-mtcars
-    hc <- highchart() %>%
-      hc_add_series(name = "mpg", data = db_hc$mpg) %>%
-      hc_add_series(name = "wt", data = db_hc$wt)
-    hc
-  })
+
   
   output$vbox1 <- renderValueBox({
     valueBox(
@@ -260,6 +333,9 @@ server <- function(input, output, session) {
   
   output$reactab <- renderReactable({
     reactable(datafile(),rownames = F,elementId = "cars-table",
+              showPageSizeOptions = TRUE,
+              selection = "multiple",
+              onClick = "select",
               theme = theme <- reactableTheme(
                 style = list(".dark &" = list(color = "#fff", background = "#282a36")),
                 cellStyle = list(".dark &" = list(color = "black",borderColor = "rgba(255, 255, 255, 0.15)")),
@@ -278,12 +354,23 @@ server <- function(input, output, session) {
                 sortNALast = TRUE,
                 header = function(value) gsub(".", " ", value, fixed = TRUE),
                 cell = function(value) format(value, nsmall = 1),
+                # style = function(value) list(value,fontWeight = 20),
                 align = "center",
-                minWidth = 140
+                minWidth = 100
                 # ,headerStyle = list(background = "#f7f7f8",borderColor = "#555")
               ),
-              columns = list(
 
+              columns = list(
+                .rownames = colDef(name = "Subject ID", sortable = TRUE, align = "left"),
+                character = colDef(
+                # Show species under character names
+                  cell = function(value) {
+
+                    div(
+                      div(style = "font-weight: 5", value)
+                      )
+                  }
+                ),
                 mpg = colDef(
                   sticky = "left",
                   style = list(borderLeft = "1px solid #eee"),
@@ -292,6 +379,40 @@ server <- function(input, output, session) {
               ),
               bordered = TRUE,
               highlight = TRUE
+    )
+  })
+  
+  output$table_state <- renderPrint({
+    state <- req(getReactableState("reactab"))
+    print(state)
+    print(names(state$sorted))
+    print(names(datafile()[1]))
+    
+  })
+  
+  output$hc_chart <- renderHighchart({
+    # db_hc <-
+    #   db[input$reactab_rows_selected, ] # filter dataset according to select rows in my_dt
+     # db_hcx<-names(datafile()[1])
+     # db_hcy<-names(state$sorted) 
+    hc <- hchart(datafile(), type="bar", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))
+    
+    # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
+    #   hc_add_series(name = "series2", data = db_hc$wt)
+    hc
+  })
+  
+  
+  output$selected_row_details <- renderUI({
+    selected <- getReactableState("reactab", "selected")
+    req(selected)
+    rowdetails <- datafile()[selected,]
+
+    tagList(
+      h2("Selected row details"),
+      tags$pre(
+        paste(capture.output(print(rowdetails, width = 200)), collapse = "\n")
+      )
     )
   })
 }
