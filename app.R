@@ -78,9 +78,14 @@ ui <- dashboardPage(
       id = "sidebarMenu",
               menuItem(icon = icon('table'),
                 # condition = "input.controlbarToggle == true",
-                text = "Tab 1",
+                text = "Preview",
                 tabName = "tab1"
-              )
+              ),
+      menuItem(icon = icon('bar-chart-o'),
+               # condition = "input.controlbarToggle == true",
+               text = "Analytics",
+               tabName = "tab2"
+      )
             )
   )
 
@@ -89,131 +94,87 @@ ui <- dashboardPage(
         tabItems(
           tabItem(
             tabName = "tab1",
-            tags$table(
-              class='table table-bordered km-table',
-              # border = 5,
-              # tags$thead(
-              #   tags$tr(
-              #     tags$th(colspan = 4, height = 100, width = 800,
-              #             align = "center", "TABLE TITLE")
-              #   )
-              # ),
-              tags$tr(class='w-2',
-                      tags$td(align = "center",class='w-25',
-                              pickerInput(
-                                inputId = "p2",
-                                label = "Select all option / custom text",
-                                choices = rownames(mtcars),
-                                multiple = TRUE,
-                                options = list(
-                                  `actions-box` = TRUE,
-                                  `deselect-all-text` = "None...",
-                                  `select-all-text` = "Yeah, all !",
-                                  `none-selected-text` = "zero"
-                                )
-                              )
-                      ),
-                      tags$td(align = "center",class='w-25',
-                              pickerInput(
-                                inputId = "p2",
-                                label = "Select all option / custom text",
-                                choices = rownames(mtcars),
-                                multiple = TRUE,
-                                options = list(
-                                  `actions-box` = TRUE,
-                                  `deselect-all-text` = "None...",
-                                  `select-all-text` = "Yeah, all !",
-                                  `none-selected-text` = "zero"
-                                )
-                              )
-                      ),
-                      tags$td(align = "center",class='w-25',
-                              pickerInput(
-                                inputId = "p2",
-                                label = "Select all option / custom text",
-                                choices = rownames(mtcars),
-                                multiple = TRUE,
-                                options = list(
-                                  `actions-box` = TRUE,
-                                  `deselect-all-text` = "None...",
-                                  `select-all-text` = "Yeah, all !",
-                                  `none-selected-text` = "zero"
-                                )
-                              )
-                      ),
-                      tags$td(align = "center",class='w-25',
-                              pickerInput(
-                                inputId = "p2",
-                                label = "Select all option / custom text",
-                                choices = rownames(mtcars),
-                                multiple = TRUE,
-                                options = list(
-                                  `actions-box` = TRUE,
-                                  `deselect-all-text` = "None...",
-                                  `select-all-text` = "Yeah, all !",
-                                  `none-selected-text` = "zero"
-                                )
-                              )
-                      )
-                      
-                      # ,tags$tr(
-                      #   tags$td(align = "center", "Data 1"),
-                      #   tags$td(align = "center", "Data 2")
-                      # )
-              )
-            ),
-            # box(width = 12,
-            # tags$head(
-              tags$table(
-                class='table table-bordered km-table',
-              # border = 5,
-                                 # tags$thead(
-                                 #   tags$tr(
-                                 #     tags$th(colspan = 4, height = 100, width = 800,
-                                 #             align = "center", "TABLE TITLE")
-                                 #   )
-                                 # ),
-                                   tags$tr(class='w-2',
-                                     tags$td(align = "center",class='w-25',
-                                             valueBoxOutput("vbox1", width = 12)
-                                     ),
-                                     tags$td(align = "center",class='w-25',
-                                             valueBoxOutput("vbox2", width = 12)
-                                     ),
-                                     tags$td(align = "center",class='w-25',
-                                             valueBoxOutput("vbox3", width = 12)
-                                     ),
-                                     tags$td(align = "center",class='w-25',
-                                             valueBoxOutput("vbox4", width = 12)
-                                     )
-                                   
-                                   # ,tags$tr(
-                                   #   tags$td(align = "center", "Data 1"),
-                                   #   tags$td(align = "center", "Data 2")
-                                   # )
-                                 )
-            )
-            # )
-          # )
-          
-          
-            
-            # fluidRow(
-            #   column(width = 3, align = 'center',
-            #          valueBoxOutput("vbox1", width = 4)
-            #          )
-            #   ,column(width = 3, align = 'center',
-            #           valueBoxOutput("vbox2", width = 4))
-            #   ,column(width = 3, align = 'center',
-            #           valueBoxOutput("vbox3", width = 4)
+            # tags$table(
+            #   class='table table-bordered km-table',
+            #   tags$tr(class='w-2',
+            #           tags$td(align = "center",class='w-25',
+            #                   pickerInput(
+            #                     inputId = "p2",
+            #                     label = "Select all option / custom text",
+            #                     choices = rownames(mtcars),
+            #                     multiple = TRUE,
+            #                     options = list(
+            #                       `actions-box` = TRUE,
+            #                       `deselect-all-text` = "None...",
+            #                       `select-all-text` = "Yeah, all !",
+            #                       `none-selected-text` = "zero"
+            #                     )
+            #                   )
+            #           ),
+            #           tags$td(align = "center",class='w-25',
+            #                   pickerInput(
+            #                     inputId = "p2",
+            #                     label = "Select all option / custom text",
+            #                     choices = rownames(mtcars),
+            #                     multiple = TRUE,
+            #                     options = list(
+            #                       `actions-box` = TRUE,
+            #                       `deselect-all-text` = "None...",
+            #                       `select-all-text` = "Yeah, all !",
+            #                       `none-selected-text` = "zero"
+            #                     )
+            #                   )
+            #           ),
+            #           tags$td(align = "center",class='w-25',
+            #                   pickerInput(
+            #                     inputId = "p2",
+            #                     label = "Select all option / custom text",
+            #                     choices = rownames(mtcars),
+            #                     multiple = TRUE,
+            #                     options = list(
+            #                       `actions-box` = TRUE,
+            #                       `deselect-all-text` = "None...",
+            #                       `select-all-text` = "Yeah, all !",
+            #                       `none-selected-text` = "zero"
+            #                     )
+            #                   )
+            #           ),
+            #           tags$td(align = "center",class='w-25',
+            #                   pickerInput(
+            #                     inputId = "p2",
+            #                     label = "Select all option / custom text",
+            #                     choices = rownames(mtcars),
+            #                     multiple = TRUE,
+            #                     options = list(
+            #                       `actions-box` = TRUE,
+            #                       `deselect-all-text` = "None...",
+            #                       `select-all-text` = "Yeah, all !",
+            #                       `none-selected-text` = "zero"
+            #                     )
+            #                   )
+            #           )
             #   )
-            #   ,column(width = 3, align = 'center',
-            #           valueBoxOutput("vbox4", width = 4
+            # ),
+
+            #   tags$table(
+            #     class='table table-bordered km-table',
+            #                        tags$tr(class='w-2',
+            #                          tags$td(align = "center",class='w-25',
+            #                                  valueBoxOutput("vbox1", width = 12)
+            #                          ),
+            #                          tags$td(align = "center",class='w-25',
+            #                                  valueBoxOutput("vbox2", width = 12)
+            #                          ),
+            #                          tags$td(align = "center",class='w-25',
+            #                                  valueBoxOutput("vbox3", width = 12)
+            #                          ),
+            #                          tags$td(align = "center",class='w-25',
+            #                                  valueBoxOutput("vbox4", width = 12)
             #                          )
-            #   )
-            # )
-              # actionButton(inputId = "controlbarToggle", label = "Toggle Controlbar"),
-          ,fluidRow(
+            # 
+            #                      )
+            # ),
+          fluidRow(
               box(width = 12,
                   # Simple theme toggle button
                   tags$button(onclick = "document.querySelector('.themeable-tbl').classList.toggle('dark')",
@@ -222,10 +183,104 @@ ui <- dashboardPage(
                   div(class = "themeable-tbl light", reactableOutput("reactab"))
                                 
               )
-          ,box(width = 12,
-               highchartOutput("hc_chart", height = "500px")
+          # ,box(width = 12,
+          #      highchartOutput("hc_chart", height = "500px")
+          # )
           )
+            
           )
+          ,tabItem(
+            tabName = "tab2",
+            tags$table(
+              class='table table-bordered km-table',
+              tags$tr(class='w-2',
+                      tags$td(align = "center",class='w-25',
+                              pickerInput(
+                                inputId = "p2",
+                                label = "Select the Subjects",
+                                choices = NULL,
+                                multiple = TRUE,
+                                options = list(
+                                  `actions-box` = TRUE,
+                                  `deselect-all-text` = "Deselect All",
+                                  `select-all-text` = "Select All",
+                                  `none-selected-text` = "Select Subjects"
+                                )
+                              )
+                      )
+                      ,tags$td(align = "center",class='w-25',
+                              pickerInput(
+                                inputId = "p3",
+                                label = "Select the Visits",
+                                choices = rownames(mtcars),
+                                multiple = TRUE,
+                                options = list(
+                                  `actions-box` = TRUE,
+                                  `deselect-all-text` = "Deselect All",
+                                  `select-all-text` = "Select All",
+                                  `none-selected-text` = "Select Visits"
+                                )
+                              )
+                      )
+                      # ,tags$td(align = "center",class='w-25',
+                      #         pickerInput(
+                      #           inputId = "p2",
+                      #           label = "Select all option / custom text",
+                      #           choices = rownames(mtcars),
+                      #           multiple = TRUE,
+                      #           options = list(
+                      #             `actions-box` = TRUE,
+                      #             `deselect-all-text` = "None...",
+                      #             `select-all-text` = "Yeah, all !",
+                      #             `none-selected-text` = "zero"
+                      #           )
+                      #         )
+                      # ),
+                      # tags$td(align = "center",class='w-25',
+                      #         pickerInput(
+                      #           inputId = "p2",
+                      #           label = "Select all option / custom text",
+                      #           choices = rownames(mtcars),
+                      #           multiple = TRUE,
+                      #           options = list(
+                      #             `actions-box` = TRUE,
+                      #             `deselect-all-text` = "None...",
+                      #             `select-all-text` = "Yeah, all !",
+                      #             `none-selected-text` = "zero"
+                      #           )
+                      #         )
+                      # )
+              )
+            ),
+            tags$table(
+              class='table table-bordered km-table',
+              tags$tr(class='w-2',
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox1", width = 12)
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox2", width = 12)
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox3", width = 12)
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox4", width = 12)
+                      )
+              )
+            )
+            ,fluidRow(
+              # box(width = 12,
+              #     tags$button(onclick = "document.querySelector('.themeable-tbl').classList.toggle('dark')",
+              #                 "Toggle light/dark"),
+              #     tags$button("Download as CSV", onclick = "Reactable.downloadDataCSV('cars-table')"),
+              #     div(class = "themeable-tbl light", reactableOutput("reactab"))
+              #     
+              # ),
+              box(width = 12,
+                   highchartOutput("hc_chart", height = "500px")
+              )
+            )
             
           )
         )
@@ -261,15 +316,29 @@ server <- function(input, output, session) {
   # observeEvent(input$controlbarToggle, {
   #   updateControlbar(id = "controlbar", session = session)
   # })
+  observe({
+    updatePickerInput(
+      session = session, inputId = "p2",
+      choices = datafile()$`Subject.ID`, selected = NULL
+    )
+    
+    updatePickerInput(
+      session = session, inputId = "p3",
+      choices = datafile()$`Visit.Date`, selected = NULL
+    )
+  })
+  
+
 
   
   output$vbox1 <- renderValueBox({
     valueBox(
       value = 150,
-      subtitle = "New orders",
+      subtitle = "Subjects",
       color = "primary",
-      icon = icon("shopping-cart"),
-      href = "#"
+      icon = icon("shopping-cart")
+      # ,href = "#"
+      ,footer = div("WIP")
     )
   })
   
@@ -277,9 +346,10 @@ server <- function(input, output, session) {
     
   valueBox(
     value = 150,
-    subtitle = "New orders",
+    subtitle = "Site",
     color = "primary",
     icon = icon("cart-shopping")
+    ,footer = div("WIP")
   )
   })
   
@@ -287,10 +357,10 @@ server <- function(input, output, session) {
       
   valueBox(
     value = "53%",
-    subtitle = "New orders",
+    subtitle = "Country",
     color = "indigo",
-    icon = icon("gears"),
-    footer = div("Hello World")
+    icon = icon("gears")
+    ,footer = div("WIP")
   )
     })
     
@@ -298,9 +368,10 @@ server <- function(input, output, session) {
         
   valueBox(
     value = "44",
-    subtitle = "User Registrations",
+    subtitle = "Site",
     color = "teal",
     icon = icon("sliders")
+    ,footer = div("WIP")
   )
       })
       
@@ -308,9 +379,10 @@ server <- function(input, output, session) {
         
         valueBox(
           value = "44",
-          subtitle = "User Registrations",
+          subtitle = "Shipped Count",
           color = "teal",
           icon = icon("sliders")
+          ,footer = div("WIP")
         )
       })
       
@@ -337,11 +409,18 @@ server <- function(input, output, session) {
               selection = "multiple",
               onClick = "select",
               theme = theme <- reactableTheme(
-                style = list(".dark &" = list(color = "#fff", background = "#282a36")),
-                cellStyle = list(".dark &" = list(color = "black",borderColor = "rgba(255, 255, 255, 0.15)")),
-                headerStyle = list(".dark &" = list(borderColor = "rgba(255, 255, 255, 0.15)")),
-                paginationStyle = list(".dark &" = list(borderColor = "rgba(255, 255, 255, 0.15)")),
-                rowHighlightStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.04)")),
+                style = list(".dark &" = list(color = "#fff", background = "#282a36")
+                             ),
+                cellStyle = list(".dark &" = list(borderColor = "grey",fontcolor = "white",fontSize = "11px")
+                                 ,".light &" = list(borderColor = "grey",fontcolor = "black",fontSize = "11px")
+                                 ),
+                headerStyle = list(".dark &" = list(borderColor = "grey",fontSize = "14px")
+                                   ,".light &" = list(borderColor = "grey",fontSize = "14px")
+                                   ),
+                paginationStyle = list(".dark &" = list(color = "black",borderColor = "rgba(255, 255, 255, 0.15)")),
+                rowHighlightStyle = list(".dark &" = list(background = "grey")
+                                         ,".light &" = list(background = "grey")
+                                         ),
                 pageButtonHoverStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.08)")),
                 pageButtonActiveStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.1)"))
               ),
