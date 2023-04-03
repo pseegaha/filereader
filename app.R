@@ -76,21 +76,39 @@ ui <- dashboardPage(
     sidebarMenu(
 
       id = "sidebarMenu",
+      # menuSubItem(
+      #   csvFileUI("datafile1","Upload & Preview")
+      #   ,
+      #   tabName = "tab1"
+      # ),
               menuItem(icon = icon('table'),
                 # condition = "input.controlbarToggle == true",
-                text = "Preview",
+                text = "Preview & Upload",
                 tabName = "tab1"
+
+
               ),
+
+      
       menuItem(icon = icon('bar-chart-o'),
                # condition = "input.controlbarToggle == true",
                text = "Analytics",
                tabName = "tab2"
       )
+      # ,menuSubItem(
+      #   text,
+      #   tabName = NULL,
+      #   href = NULL,
+      #   newTab = NULL,
+      #   icon = shiny::icon("angles-right"),
+      #   selected = NULL
+      # )
             )
   )
 
     ,
   body =   dashboardBody(
+     tags$script('$(function(){$(\'[data-value="button1"]\').click(function(){$("#controlbar").css("color", "grey")})})'),
         tabItems(
           tabItem(
             tabName = "tab1",
@@ -191,6 +209,8 @@ ui <- dashboardPage(
           )
           ,tabItem(
             tabName = "tab2",
+            wellPanel(style="align:center;background:white",
+            # fluidRow(column(width=12, align = "center",
             tags$table(
               class='table table-bordered km-table',
               tags$tr(class='w-2',
@@ -201,6 +221,7 @@ ui <- dashboardPage(
                                 choices = NULL,
                                 multiple = TRUE,
                                 options = list(
+                                  `live-search`=TRUE,
                                   `actions-box` = TRUE,
                                   `deselect-all-text` = "Deselect All",
                                   `select-all-text` = "Select All",
@@ -211,10 +232,11 @@ ui <- dashboardPage(
                       ,tags$td(align = "center",class='w-25',
                               pickerInput(
                                 inputId = "p3",
-                                label = "Select the Visits",
-                                choices = rownames(mtcars),
+                                label = "Select the Visit Name",
+                                choices = NULL,
                                 multiple = TRUE,
                                 options = list(
+                                  `live-search`=TRUE,
                                   `actions-box` = TRUE,
                                   `deselect-all-text` = "Deselect All",
                                   `select-all-text` = "Select All",
@@ -222,6 +244,36 @@ ui <- dashboardPage(
                                 )
                               )
                       )
+              )
+            # )
+            # )
+                      , 
+
+                              
+            fluidRow(column(width=12, align = "center",
+                            div(style="display:inline-block; width: 220px;height: 75px;",
+                              airDatepickerInput(
+                        inputId = "multiple1",
+                        label = "Select first visit date:",
+                        placeholder = "Pick the first",
+                        multiple = 1, clearButton = TRUE
+                      )
+                              )
+                      , 
+                      div(style="display:inline-block; width: 220px;height: 75px;",
+                          
+                      airDatepickerInput(
+                        inputId = "multiple2",
+                        label = "Select last visit date:",
+                        placeholder = "Pick the last",
+                        multiple = 1, clearButton = TRUE
+                      )
+                      )
+)
+)
+)
+
+              
                       # ,tags$td(align = "center",class='w-25',
                       #         pickerInput(
                       #           inputId = "p2",
@@ -250,7 +302,7 @@ ui <- dashboardPage(
                       #           )
                       #         )
                       # )
-              )
+              
             ),
             tags$table(
               class='table table-bordered km-table',
@@ -279,6 +331,14 @@ ui <- dashboardPage(
               # ),
               box(width = 12,
                    highchartOutput("hc_chart", height = "500px")
+              ),
+              box(width = 12,
+                  # Simple theme toggle button
+                  tags$button(onclick = "document.querySelector('.themeable-tbl2').classList.toggle('dark')",
+                              "Toggle light/dark"),
+                  tags$button("Download as CSV", onclick = "Reactable.downloadDataCSV('cars-table2')"),
+                  div(class = "themeable-tbl2 light", reactableOutput("reactab2"))
+                  
               )
             )
             
@@ -287,11 +347,19 @@ ui <- dashboardPage(
   )
 ,controlbar = dashboardControlbar(
   id = "controlbar",
+  width = 600,
   collapsed = FALSE,
   overlay = TRUE
-  ,csvFileUI("datafile", "Data Uploader(.csv)")
-  ,uiOutput("selected_row_details")
-  ,verbatimTextOutput("table_state")
+  ,pinned = FALSE
+  # ,controlbarItem(id = "button1", title = "button1"
+  #                 ,csvFileUI("datafile1", NULL))
+  ,fluidRow(column(width=12,align='center',tags$h4("Preview & Upload")
+  ,csvFileUI("datafile", NULL)))
+  ,
+                   wellPanel(style="background:white;text-align:center",
+                   uiOutput("selected_row_details")
+  ,verbatimTextOutput("table_state"))
+  
 
 
 ),
@@ -324,7 +392,7 @@ server <- function(input, output, session) {
     
     updatePickerInput(
       session = session, inputId = "p3",
-      choices = datafile()$`Visit.Date`, selected = NULL
+      choices = datafile()$`Visit.Name`, selected = NULL
     )
   })
   
@@ -406,8 +474,8 @@ server <- function(input, output, session) {
   output$reactab <- renderReactable({
     reactable(datafile(),rownames = F,elementId = "cars-table",
               showPageSizeOptions = TRUE,
-              selection = "multiple",
-              onClick = "select",
+              # selection = "multiple",
+              # onClick = "select",
               theme = theme <- reactableTheme(
                 style = list(".dark &" = list(color = "#fff", background = "#282a36")
                              ),
@@ -481,9 +549,67 @@ server <- function(input, output, session) {
     hc
   })
   
+  output$reactab2 <- renderReactable({
+    reactable(datafile(),rownames = F,elementId = "cars-table2",
+              showPageSizeOptions = TRUE,
+              selection = "multiple",
+              onClick = "select",
+              theme = theme <- reactableTheme(
+                style = list(".dark &" = list(color = "#fff", background = "#282a36")
+                ),
+                cellStyle = list(".dark &" = list(borderColor = "grey",fontcolor = "white",fontSize = "11px")
+                                 ,".light &" = list(borderColor = "grey",fontcolor = "black",fontSize = "11px")
+                ),
+                headerStyle = list(".dark &" = list(borderColor = "grey",fontSize = "14px")
+                                   ,".light &" = list(borderColor = "grey",fontSize = "14px")
+                ),
+                paginationStyle = list(".dark &" = list(color = "black",borderColor = "rgba(255, 255, 255, 0.15)")),
+                rowHighlightStyle = list(".dark &" = list(background = "grey")
+                                         ,".light &" = list(background = "grey")
+                ),
+                pageButtonHoverStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.08)")),
+                pageButtonActiveStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.1)"))
+              ),
+              paginationType = "jump",
+              striped = F,
+              resizable = TRUE,
+              showSortable = TRUE,
+              filterable = TRUE,
+              defaultColDef = colDef(
+                sortNALast = TRUE,
+                header = function(value) gsub(".", " ", value, fixed = TRUE),
+                cell = function(value) format(value, nsmall = 1),
+                # style = function(value) list(value,fontWeight = 20),
+                align = "center",
+                minWidth = 100
+                # ,headerStyle = list(background = "#f7f7f8",borderColor = "#555")
+              ),
+              
+              columns = list(
+                .rownames = colDef(name = "Subject ID", sortable = TRUE, align = "left"),
+                character = colDef(
+                  # Show species under character names
+                  cell = function(value) {
+                    
+                    div(
+                      div(style = "font-weight: 5", value)
+                    )
+                  }
+                ),
+                mpg = colDef(
+                  sticky = "left",
+                  style = list(borderLeft = "1px solid #eee"),
+                  headerStyle = list(borderLeft = "1px solid #eee")
+                )
+              ),
+              bordered = TRUE,
+              highlight = TRUE
+    )
+  })
+  
   
   output$selected_row_details <- renderUI({
-    selected <- getReactableState("reactab", "selected")
+    selected <- getReactableState("reactab2", "selected")
     req(selected)
     rowdetails <- datafile()[selected,]
 
