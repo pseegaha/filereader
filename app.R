@@ -247,6 +247,24 @@ ui <- dashboardPage(
           )
           ,tabItem(
             tabName = "tab2",
+            tags$table(
+              class='table table-bordered km-table',
+              tags$tr(class='w-2',
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox1", width = 12)
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox2", width = 12)
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox3", width = 12)
+                      ),
+                      tags$td(align = "center",class='w-25',
+                              valueBoxOutput("vbox4", width = 12)
+                      )
+              )
+            )
+            ,
             wellPanel(style="align:center;background:white",
             # fluidRow(column(width=12, align = "center",
             tags$table(
@@ -342,24 +360,7 @@ ui <- dashboardPage(
                       # )
               
             ),
-            tags$table(
-              class='table table-bordered km-table',
-              tags$tr(class='w-2',
-                      tags$td(align = "center",class='w-25',
-                              valueBoxOutput("vbox1", width = 12)
-                      ),
-                      tags$td(align = "center",class='w-25',
-                              valueBoxOutput("vbox2", width = 12)
-                      ),
-                      tags$td(align = "center",class='w-25',
-                              valueBoxOutput("vbox3", width = 12)
-                      ),
-                      tags$td(align = "center",class='w-25',
-                              valueBoxOutput("vbox4", width = 12)
-                      )
-              )
-            )
-            ,fluidRow(
+            fluidRow(
               # box(width = 12,
               #     tags$button(onclick = "document.querySelector('.themeable-tbl').classList.toggle('dark')",
               #                 "Toggle light/dark"),
@@ -426,67 +427,88 @@ server <- function(input, output, session) {
   observe({
     updatePickerInput(
       session = session, inputId = "p2",
-      choices = datafile()$`Subject.ID`, selected = NULL
+      choices = unique(datafile()$`Subject.ID`), selected = NULL
     )
     
     updatePickerInput(
       session = session, inputId = "p3",
-      choices = datafile()$`Visit.Name`, selected = NULL
+      choices = unique(datafile()$`Visit.Name`), selected = NULL
     )
+    
+    updateAirDateInput(
+      session =session,
+      inputId = 'multiple1',
+      value = min(as.Date(dmy(df$Visit.Dat)))
+    )
+    
+    updateAirDateInput(
+      session =session,
+      inputId = 'multiple2',
+      value = max(as.Date(dmy(df$Visit.Dat)))
+    )
+    
   })
   
   
   output$vbox1 <- renderValueBox({
     valueBox(
-      value = 150,
+      value = length(unique(datafile()$`Subject.ID`)),
       subtitle = "Subjects",
       color = "primary",
-      icon = icon("shopping-cart")
+      icon = NULL
+      # icon = icon("shopping-cart")
+      
       # ,href = "#"
-      ,footer = div("WIP")
+      ,footer = div("")
     )
   })
+
   
   output$vbox2 <- renderValueBox({
     
   valueBox(
-    value = 150,
+    value = length(unique(datafile()$`Site`)),
     subtitle = "Site",
     color = "primary",
-    icon = icon("cart-shopping")
-    ,footer = div("WIP")
+    icon = NULL
+    # icon = icon("cart-shopping")
+    ,footer = div("")
   )
   })
   
   output$vbox3 <- renderValueBox({
       
   valueBox(
-    value = "53%",
+    value = length(unique(datafile()$`Country`)),
     subtitle = "Country",
     color = "indigo",
-    icon = icon("gears")
-    ,footer = div("WIP")
+    icon = NULL
+    # icon = icon("gears")
+    
+    ,footer = div("")
   )
     })
     
-  output$vbox4 <- renderValueBox({
+  output$vbox5 <- renderValueBox({
   valueBox(
-    value = "44",
+    value = length(unique(datafile()$`Site`)),
     subtitle = "Site",
     color = "teal",
-    icon = icon("sliders")
-    ,footer = div("WIP")
+    icon = NULL
+    # icon = icon("sliders")
+    ,footer = div("")
   )
       })
       
-      output$vbox5 <- renderValueBox({
+      output$vbox4 <- renderValueBox({
         
         valueBox(
-          value = "44",
+          value = length(which(datafile()$`Sample.Status`=="Shipped")),
           subtitle = "Shipped Count",
           color = "teal",
-          icon = icon("sliders")
-          ,footer = div("WIP")
+          icon = NULL
+          # icon = icon("sliders")
+          ,footer = div("")
         )
       })
       
@@ -651,14 +673,16 @@ server <- function(input, output, session) {
   
   output$hc_chart <- renderHighchart({
     highchart() %>% 
-      hc_chart(type = "column") %>%
-      hc_plotOptions(column = list(stacking = "normal")) %>%
-      hc_xAxis(categories = dfr()$`Visit.Name`) %>%
-      hc_add_series(name="Visit Name",
+    hc_title(text = "Title") %>% 
+      hc_subtitle(text = "Subtitle") %>% 
+      hc_chart(type = "column", polar = F) %>%
+      hc_plotOptions(column = list(dataLabels = list(enabled = F),stacking = "normal")) %>%
+      hc_xAxis(categories = dfr()$`Site`) %>%
+      hc_add_series(name="Subject ID",
                     data = dfr()$`Subject.ID`,
                     stack = "1") %>%
-      hc_add_series(name="site",
-                    data = dfr()$`Site`,
+      hc_add_series(name="Visit Name",
+                    data = dfr()$`Visit.Name`,
                     stack = "2") %>%
       hc_add_series(name="Country",
                     data = dfr()$`Country`,
