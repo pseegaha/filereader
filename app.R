@@ -10,6 +10,44 @@ library(highcharter)
 library(htmltools)
 library(shinyWidgets)
 
+# selectPointsByDrag
+s1 <- JS("/**
+         * Custom selection handler that selects points and cancels the default zoom behaviour
+         */
+         function selectPointsByDrag(e) {
+           var xArr = []
+           // Select points
+           Highcharts.each(this.series, function (series) {
+             Highcharts.each(series.points, function (point) {
+               if (point.x >= e.xAxis[0].min && point.x <= e.xAxis[0].max &&
+                   point.y >= e.yAxis[0].min && point.y <= e.yAxis[0].max) {
+                 xArr.push(point.x);
+                 point.select(true, true);
+
+               }
+             });
+           });
+           Shiny.onInputChange('R_xArr', xArr);
+
+           // Fire a custom event
+           Highcharts.fireEvent(this, 'selectedpoints', { points: this.getSelectedPoints() });
+
+           return false; // Don't zoom
+           }")
+
+# unselectByClick
+s2 <- JS("/**
+         * On click, unselect all points
+         */
+         function unselectByClick() {
+           var points = this.getSelectedPoints();
+           if (points.length > 0) {
+             Highcharts.each(points, function (point) {
+               point.select(false);
+             });
+           }
+         }")
+
 # hchart(mtcars, type="point", hcaes(x=mpg, y=cyl,color=hp,group=gear,variable=carb), name = "carb",dataLabels = list(enabled = F))
 
 csvFileServer <- function(id, stringsAsFactors) {
@@ -330,7 +368,8 @@ ui <- dashboardPage(
               #     
               # ),
               box(width = 12,
-                   highchartOutput("hc_chart", height = "500px")
+                   highchartOutput("hc_chart", height = "500px"),
+                  tableOutput("view")
               ),
               box(width = 12,
                   # Simple theme toggle button
@@ -396,8 +435,6 @@ server <- function(input, output, session) {
     )
   })
   
-
-
   
   output$vbox1 <- renderValueBox({
     valueBox(
@@ -432,8 +469,7 @@ server <- function(input, output, session) {
   )
     })
     
-      output$vbox4 <- renderValueBox({
-        
+  output$vbox4 <- renderValueBox({
   valueBox(
     value = "44",
     subtitle = "Site",
@@ -517,12 +553,12 @@ server <- function(input, output, session) {
                       div(style = "font-weight: 5", value)
                       )
                   }
-                ),
-                mpg = colDef(
-                  sticky = "left",
-                  style = list(borderLeft = "1px solid #eee"),
-                  headerStyle = list(borderLeft = "1px solid #eee")
                 )
+                # ,mpg = colDef(
+                #   sticky = "left",
+                #   style = list(borderLeft = "1px solid #eee"),
+                #   headerStyle = list(borderLeft = "1px solid #eee")
+                # )
               ),
               bordered = TRUE,
               highlight = TRUE
@@ -537,20 +573,115 @@ server <- function(input, output, session) {
     
   })
   
+
+   fdf<-reactive({
+     df <- read.csv("indata.csv")
+     fdf = data.frame(
+       x=df$`Subject.ID`
+       ,y=df$`Visit.Name`
+       ,z=df$`Visit.Date`
+     )
+     
+     dat = fdf[fdf$x %in% input$p2 && fdf$y %in% input$p3,]
+     return(dat)
+     })
+# 
+#    observe({
+#      print(fdf())
+#    })
+#    
+
+  
+  # output$hc_chart <- renderHighchart({
+  #   highchart() %>%
+  #     hc_chart(zoomType = 'xy', events = list(selection = s1, click = s2)) %>%
+  #     hc_add_series(fdf(), "bar") %>%
+  #     hc_add_event_point(event = "unselect")
+  # })
+  
+  # output$hc_chart <- renderHighchart({
+  #   # db_hc <-
+  #   #   db[input$reactab_rows_selected, ] # filter dataset according to select rows in my_dt
+  #    # db_hcx<-names(datafile()[1])
+  #    # db_hcy<-names(state$sorted) 
+  #   hc <- hchart(datafile(), type="scatter", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))%>%
+  #     hc_chart(zoomType = 'xy', events = list(selection = s1, click = s2))%>%
+  #     hc_add_event_point(event = "unselect")
+  #   # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
+  #   #   hc_add_series(name = "series2", data = db_hc$wt)
+  #   hc
+  # })
+  
+  selected.points <- reactiveValues(x = NULL, y = NULL)
+  
+  output$view <- renderTable({
+    if (is.null(selected.points$x) || is.null(selected.points$y)) {
+      return(NULL)
+    } else {
+      data.table(x = selected.points$x, y = selected.points$y)  
+    }
+  })
+  
+  observeEvent(input$R_xArr, {
+    selected.points$x <- sort(unique(c(selected.points$x, input$R_xArr)))
+    selected.points$y <- df$y[df$x %in% selected.points$x]
+  })
+  
+  observeEvent(input$plot_hc_unselect, {
+    selected.points$x <- NULL 
+    selected.points$y <- NULL
+  })
+  
+  dfr<-reactive({
+    df <- datafile()
+    df <- df[df$`Subject.ID` %in% input$p2 & df$`Visit.Name` %in% input$p3,]
+    return(df)
+  })
+  
+  # output$hc_chart <- renderHighchart({
+  #   # db_hc <-
+  #   #   db[input$reactab_rows_selected, ] # filter dataset according to select rows in my_dt
+  #    # db_hcx<-names(datafile()[1])
+  #    # db_hcy<-names(state$sorted)
+  #   hc <- hchart(dfr(), type="bar", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))
+  #   # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
+  #   #   hc_add_series(name = "series2", data = db_hc$wt)
+  #   hc
+  # })
+  
   output$hc_chart <- renderHighchart({
-    # db_hc <-
-    #   db[input$reactab_rows_selected, ] # filter dataset according to select rows in my_dt
-     # db_hcx<-names(datafile()[1])
-     # db_hcy<-names(state$sorted) 
-    hc <- hchart(datafile(), type="bar", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))
-    
-    # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
-    #   hc_add_series(name = "series2", data = db_hc$wt)
-    hc
+    highchart() %>% 
+      hc_chart(type = "column") %>%
+      hc_plotOptions(column = list(stacking = "normal")) %>%
+      hc_xAxis(categories = dfr()$`Visit.Name`) %>%
+      hc_add_series(name="Visit Name",
+                    data = dfr()$`Subject.ID`,
+                    stack = "1") %>%
+      hc_add_series(name="site",
+                    data = dfr()$`Site`,
+                    stack = "2") %>%
+      hc_add_series(name="Country",
+                    data = dfr()$`Country`,
+                    stack = "3")%>%
+      hc_add_series(name="Sample Status",
+                    data = dfr()$`Sample.Status`,
+                    stack = "4") %>%
+      hc_add_series(name="Central Servicing Lab",
+                    data = dfr()$`Central.Servicing.Lab`,
+                    stack = "5") %>%
+      hc_add_theme(hc_theme_ft())
+    # hc <- hchart(dfr(), type="bar", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))
+    # # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
+    # #   hc_add_series(name = "series2", data = db_hc$wt)
+    # hc
+  })
+  
+  observe({
+    print(dfr())
   })
   
   output$reactab2 <- renderReactable({
-    reactable(datafile(),rownames = F,elementId = "cars-table2",
+    reactable(dfr(),rownames = F,elementId = "cars-table2",
               showPageSizeOptions = TRUE,
               selection = "multiple",
               onClick = "select",
@@ -595,12 +726,12 @@ server <- function(input, output, session) {
                       div(style = "font-weight: 5", value)
                     )
                   }
-                ),
-                mpg = colDef(
-                  sticky = "left",
-                  style = list(borderLeft = "1px solid #eee"),
-                  headerStyle = list(borderLeft = "1px solid #eee")
                 )
+                # ,mpg = colDef(
+                #   sticky = "left",
+                #   style = list(borderLeft = "1px solid #eee"),
+                #   headerStyle = list(borderLeft = "1px solid #eee")
+                # )
               ),
               bordered = TRUE,
               highlight = TRUE
