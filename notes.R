@@ -42,6 +42,8 @@ s2 <- JS("/**
            }
          }")
 
+
+
 shinyApp(
   ui = fluidPage(
     highchartOutput("plot_hc"),

@@ -9,6 +9,7 @@ library(reactable)
 library(highcharter)
 library(htmltools)
 library(shinyWidgets)
+library(lubridate)
 
 # selectPointsByDrag
 s1 <- JS("/**
@@ -47,6 +48,19 @@ s2 <- JS("/**
              });
            }
          }")
+
+easeOutBounce  <- JS("function (pos) {
+  if ((pos) < (1 / 2.75)) {
+    return (7.5625 * pos * pos);
+  }
+  if (pos < (2 / 2.75)) {
+    return (7.5625 * (pos -= (1.5 / 2.75)) * pos + 0.75);
+  }
+  if (pos < (2.5 / 2.75)) {
+    return (7.5625 * (pos -= (2.25 / 2.75)) * pos + 0.9375);
+  }
+  return (7.5625 * (pos -= (2.625 / 2.75)) * pos + 0.984375);
+}")
 
 # hchart(mtcars, type="point", hcaes(x=mpg, y=cyl,color=hp,group=gear,variable=carb), name = "carb",dataLabels = list(enabled = F))
 
@@ -671,34 +685,74 @@ server <- function(input, output, session) {
   #   hc
   # })
   
+
   output$hc_chart <- renderHighchart({
+    
+    library(dplyr)
+    indata<-dfr() %>%
+      group_by(dfr()$`Subject.ID`) %>%
+      mutate(kcount = n())
+    
+    # I've tried to created a function using `JS`:
+    
     highchart() %>% 
-    hc_title(text = "Title") %>% 
-      hc_subtitle(text = "Subtitle") %>% 
-      hc_chart(type = "column", polar = F) %>%
-      hc_plotOptions(column = list(dataLabels = list(enabled = F),stacking = "normal")) %>%
-      hc_xAxis(categories = dfr()$`Site`) %>%
-      hc_add_series(name="Subject ID",
-                    data = dfr()$`Subject.ID`,
-                    stack = "1") %>%
-      hc_add_series(name="Visit Name",
-                    data = dfr()$`Visit.Name`,
-                    stack = "2") %>%
-      hc_add_series(name="Country",
-                    data = dfr()$`Country`,
-                    stack = "3")%>%
-      hc_add_series(name="Sample Status",
-                    data = dfr()$`Sample.Status`,
-                    stack = "4") %>%
-      hc_add_series(name="Central Servicing Lab",
-                    data = dfr()$`Central.Servicing.Lab`,
-                    stack = "5") %>%
-      hc_add_theme(hc_theme_ft())
-    # hc <- hchart(dfr(), type="bar", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))
-    # # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
-    # #   hc_add_series(name = "series2", data = db_hc$wt)
-    # hc
+      hc_title(text = "Patient Status",
+               style = list(fontSize = "15px", fontWeight = "bold")) %>% 
+      hc_subtitle(text = "Frequency of Occurences") %>% 
+      hc_chart(type = "column") %>%
+      hc_plotOptions(column = list(stacking = "normal"))  %>%
+      hc_add_series(data = indata,
+                    animatio = list(
+                      duration = 1000,
+                      easing = easeOutBounce
+                    ),
+                    type = 'column',
+                    hcaes(x = unique(Subject.ID), y = kcount,group= Sample.Status,fill=Sample.Status)
+      ) %>%
+      hc_xAxis(title = list(text = "Subjects"),categories = indata$Subject.ID,
+               tickmarkPlacement = "on",
+               plotLines = list(
+                 list(label = list(
+                   rotation = 90))
+               ))%>%
+      hc_yAxis(title = list(text = "Frequency"),offset = 10) %>%
+      # hc_tooltip(pointFormat = "<b> Freq: </b> {point.kcount}",shared = F)%>%
+      hc_add_theme(hc_theme_google())%>%
+      hc_legend(reversed = TRUE)%>%hc_exporting(
+        enabled = TRUE, # always enabled
+        filename = "Intellia_Patient_Status"
+      )
+    
   })
+  
+  # output$hc_chart <- renderHighchart({
+  #   highchart() %>% 
+  #   hc_title(text = "Title") %>% 
+  #     hc_subtitle(text = "Subtitle") %>% 
+  #     hc_chart(type = "column", polar = F) %>%
+  #     hc_plotOptions(column = list(dataLabels = list(enabled = F),stacking = "normal")) %>%
+  #     hc_xAxis(categories = dfr()$`Site`) %>%
+  #     hc_add_series(name="Subject ID",
+  #                   data = dfr()$`Subject.ID`,
+  #                   stack = "1") %>%
+  #     hc_add_series(name="Visit Name",
+  #                   data = dfr()$`Visit.Name`,
+  #                   stack = "2") %>%
+  #     hc_add_series(name="Country",
+  #                   data = dfr()$`Country`,
+  #                   stack = "3")%>%
+  #     hc_add_series(name="Sample Status",
+  #                   data = dfr()$`Sample.Status`,
+  #                   stack = "4") %>%
+  #     hc_add_series(name="Central Servicing Lab",
+  #                   data = dfr()$`Central.Servicing.Lab`,
+  #                   stack = "5") %>%
+  #     hc_add_theme(hc_theme_ft())
+  #   # hc <- hchart(dfr(), type="bar", hcaes(x=Subject.ID,y=Site ), name = "carb",dataLabels = list(enabled = F))
+  #   # # %>% hc_add_series(name = "series1", data = db_hc$mpg) %>%
+  #   # #   hc_add_series(name = "series2", data = db_hc$wt)
+  #   # hc
+  # })
   
   observe({
     print(dfr())
