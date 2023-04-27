@@ -148,8 +148,15 @@ ui <- dashboardPage(
       menuItem(
         icon = icon('bar-chart-o'),
         # condition = "input.controlbarToggle == true",
-        text = "Analytics",
+        text = "Subject Analytics",
         tabName = "tab2"
+      )
+      ,
+      menuItem(
+        icon = icon('bar-chart-o'),
+        # condition = "input.controlbarToggle == true",
+        text = "Visit Analytics",
+        tabName = "tab3"
       )
       # ,menuSubItem(
       #   text,
@@ -215,14 +222,9 @@ ui <- dashboardPage(
         ,
         wellPanel(
           style = "align:center;background:white",
-          # fluidRow(column(width=12, align = "center",
-          tags$table(
-            class = 'table table-bordered km-table',
-            tags$tr(
-              class = 'w-2',
-              tags$td(
-                align = "center",
-                class = 'w-25',
+          fluidRow(column(width=6, align = "center",
+
+
                 pickerInput(
                   inputId = "p2",
                   label = "Select the Subjects",
@@ -238,9 +240,7 @@ ui <- dashboardPage(
                 )
               )
               ,
-              tags$td(
-                align = "center",
-                class = 'w-25',
+              column(width=6, align = "center",
                 pickerInput(
                   inputId = "p3",
                   label = "Select the Visit Name",
@@ -254,17 +254,16 @@ ui <- dashboardPage(
                     `none-selected-text` = "Select Visits"
                   )
                 )
-              )
+ 
             )
-            
+          )
             ,
             
             
             fluidRow(column(
-              width = 12,
+              width = 6,
               align = "center",
-              div(
-                style = "display:inline-block; width: 220px;height: 75px;",
+
                 airDatepickerInput(
                   inputId = "multiple1",
                   label = "Select first visit date:",
@@ -272,11 +271,11 @@ ui <- dashboardPage(
                   multiple = 1,
                   clearButton = TRUE
                 )
-              )
+            )
+              
               ,
-              div(
-                style = "display:inline-block; width: 220px;height: 75px;",
-                
+            column(
+              width = 6, align = "center",
                 airDatepickerInput(
                   inputId = "multiple2",
                   label = "Select last visit date:",
@@ -284,9 +283,9 @@ ui <- dashboardPage(
                   multiple = 1,
                   clearButton = TRUE
                 )
-              )
+              
             ))
-          )
+          
           
           
         ),
@@ -319,6 +318,134 @@ ui <- dashboardPage(
         )
         
       )
+      # ,tabitem(
+      #   tabName = "tab3",
+      #   tags$table(
+      #     class = 'table table-bordered km-table',
+      #     tags$tr(
+      #       class = 'w-2',
+      #       tags$td(
+      #         align = "center",
+      #         class = 'w-25',
+      #         valueBoxOutput("svbox1", width = 12)
+      #       ),
+      #       tags$td(
+      #         align = "center",
+      #         class = 'w-25',
+      #         valueBoxOutput("svbox2", width = 12)
+      #       ),
+      #       tags$td(
+      #         align = "center",
+      #         class = 'w-25',
+      #         valueBoxOutput("svbox3", width = 12)
+      #       ),
+      #       tags$td(
+      #         align = "center",
+      #         class = 'w-25',
+      #         valueBoxOutput("svbox4", width = 12)
+      #       )
+      #     )
+      #   )
+      #   ,
+      #   wellPanel(
+      #     style = "align:center;background:white",
+      #     fluidRow(column(width=6, align = "center",
+      #                     
+      #                     
+      #                     pickerInput(
+      #                       inputId = "sp2",
+      #                       label = "Select the Subjects",
+      #                       choices = NULL,
+      #                       multiple = TRUE,
+      #                       options = list(
+      #                         `live-search` = TRUE,
+      #                         `actions-box` = TRUE,
+      #                         `deselect-all-text` = "Deselect All",
+      #                         `select-all-text` = "Select All",
+      #                         `none-selected-text` = "Select Subjects"
+      #                       )
+      #                     )
+      #     )
+      #     ,
+      #     column(width=6, align = "center",
+      #            pickerInput(
+      #              inputId = "sp3",
+      #              label = "Select the Visit Name",
+      #              choices = NULL,
+      #              multiple = TRUE,
+      #              options = list(
+      #                `live-search` = TRUE,
+      #                `actions-box` = TRUE,
+      #                `deselect-all-text` = "Deselect All",
+      #                `select-all-text` = "Select All",
+      #                `none-selected-text` = "Select Visits"
+      #              )
+      #            )
+      #            
+      #     )
+      #     )
+      #     ,
+      #     
+      #     
+      #     fluidRow(column(
+      #       width = 6,
+      #       align = "center",
+      #       
+      #       airDatepickerInput(
+      #         inputId = "smultiple1",
+      #         label = "Select first visit date:",
+      #         placeholder = "Pick the first",
+      #         multiple = 1,
+      #         clearButton = TRUE
+      #       )
+      #     )
+      #     
+      #     ,
+      #     column(
+      #       width = 6, align = "center",
+      #       airDatepickerInput(
+      #         inputId = "smultiple2",
+      #         label = "Select last visit date:",
+      #         placeholder = "Pick the last",
+      #         multiple = 1,
+      #         clearButton = TRUE
+      #       )
+      #       
+      #     ))
+      #     
+      #     
+      #     
+      #   ),
+      #   fluidRow(
+      #     box(
+      #       width = 12,
+      #       highchartOutput("shc_chart", height = "500px"),
+      #       tableOutput("sview")
+      #     ),
+      #     box(
+      #       width = 12,
+      #       plotlyOutput(
+      #         outputId = 'splotly_chart',
+      #         width = "100%",
+      #         height = "400px",
+      #         inline = FALSE,
+      #         reportTheme = TRUE,
+      #         fill = !inline
+      #       )
+      #     ),
+      #     box(
+      #       width = 12,
+      #       # Simple theme toggle button
+      #       tags$button(onclick = "document.querySelector('.themeable-stbl2').classList.toggle('dark')",
+      #                   "Toggle light/dark"),
+      #       tags$button("Download as CSV", onclick = "Reactable.downloadDataCSV('scars-table2')"),
+      #       div(class = "themeable-tbl2 light", reactableOutput("sreactab2"))
+      #       
+      #     )
+      #   )
+      #   
+      #   
+      # )
     )
   )
   ,
@@ -383,6 +510,30 @@ server <- function(input, output, session) {
     
   })
   
+  observe({
+    updatePickerInput(
+      session = session,
+      inputId = "sp2",
+      choices = unique(datafile()$`Subject.ID`),
+      selected = NULL
+    )
+    
+    updatePickerInput(
+      session = session,
+      inputId = "sp3",
+      choices = unique(datafile()$`Visit.Name`),
+      selected = NULL
+    )
+    
+    updateAirDateInput(session = session,
+                       inputId = 'smultiple1',
+                       value = min(as.Date(dmy(df$Visit.Dat))))
+    
+    updateAirDateInput(session = session,
+                       inputId = 'smultiple2',
+                       value = max(as.Date(dmy(df$Visit.Dat))))
+    
+  })
   
   output$vbox1 <- renderValueBox({
     valueBox(
@@ -437,6 +588,72 @@ server <- function(input, output, session) {
   })
   
   output$vbox4 <- renderValueBox({
+    valueBox(
+      value = length(which(
+        datafile()$`Sample.Status` == "Shipped"
+      )),
+      subtitle = "Shipped Count",
+      color = "teal",
+      icon = NULL
+      # icon = icon("sliders")
+      ,
+      footer = div("")
+    )
+  })
+  
+  output$svbox1 <- renderValueBox({
+    valueBox(
+      value = length(unique(datafile()$`Subject.ID`)),
+      subtitle = "Subjects",
+      color = "primary",
+      icon = NULL
+      # icon = icon("shopping-cart")
+      
+      # ,href = "#"
+      ,
+      footer = div("")
+    )
+  })
+  
+  
+  output$svbox2 <- renderValueBox({
+    valueBox(
+      value = length(unique(datafile()$`Site`)),
+      subtitle = "Site",
+      color = "primary",
+      icon = NULL
+      # icon = icon("cart-shopping")
+      ,
+      footer = div("")
+    )
+  })
+  
+  output$svbox3 <- renderValueBox({
+    valueBox(
+      value = length(unique(datafile()$`Country`)),
+      subtitle = "Country",
+      color = "indigo",
+      icon = NULL
+      # icon = icon("gears")
+      
+      ,
+      footer = div("")
+    )
+  })
+  
+  output$svbox5 <- renderValueBox({
+    valueBox(
+      value = length(unique(datafile()$`Site`)),
+      subtitle = "Site",
+      color = "teal",
+      icon = NULL
+      # icon = icon("sliders")
+      ,
+      footer = div("")
+    )
+  })
+  
+  output$svbox4 <- renderValueBox({
     valueBox(
       value = length(which(
         datafile()$`Sample.Status` == "Shipped"
@@ -582,20 +799,47 @@ server <- function(input, output, session) {
   
   output$plotly_chart <- renderPlotly({
     library(dplyr)
-    indata <- dfr() %>%
-      group_by(dfr()$`Subject.ID`) %>%
+    indata <- dfr() %>% 
+      group_by(dfr()$`Subject.ID`)%>%
       mutate(kcount = n())
     
+    print(c(indata$`Subject.ID`,indata$kcount))
     plot_ly(
       indata,
-      x = ~ indata$`Subject.ID`,
-      y = ~ indata$`kcount`,
-      group =  ~ indata$`Sample.Status`,
-      color =  ~ indata$`Sample.Status` ,
-      type = 'bar'
+      x = ~`Subject.ID`,
+      y = ~`kcount`,
+      group =~`Sample.Status`,
+      color =~`Sample.Status` ,
+      type = 'bar',
+      hovertemplate = paste("<b>%{xaxis.title.text}:  %{x}</b><br>",
+                            "%{yaxis.title.text}:  %{y}<br><extra></extra>")
     ) %>% layout(
       title = "Patient Status",
-      barmode = 'group',
+      barmode = 'stack',
+      xaxis = list(title = "Subject ID's"),
+      ## Order & label the x-axis
+      yaxis = list(title = "Frequency of Occurences")
+    )
+  })
+  output$splotly_chart <- renderPlotly({
+    library(dplyr)
+    indata <- dfr() %>% 
+      group_by(dfr()$`Subject.ID`)%>%
+      mutate(kcount = n())
+    
+    print(c(indata$`Subject.ID`,indata$kcount))
+    plot_ly(
+      indata,
+      x = ~`Subject.ID`,
+      y = ~`kcount`,
+      group =~`Sample.Status`,
+      color =~`Sample.Status` ,
+      type = 'bar',
+      hovertemplate = paste("<b>%{xaxis.title.text}:  %{x}</b><br>",
+                            "%{yaxis.title.text}:  %{y}<br><extra></extra>")
+    ) %>% layout(
+      title = "Patient Status",
+      barmode = 'stack',
       xaxis = list(title = "Subject ID's"),
       ## Order & label the x-axis
       yaxis = list(title = "Frequency of Occurences")
@@ -642,14 +886,58 @@ server <- function(input, output, session) {
     
   })
   
-  
-  observe({
-    print(dfr())
+  output$shc_chart <- renderHighchart({
+    library(dplyr)
+    indata <- dfr() %>%
+      group_by(dfr()$`Subject.ID`) %>%
+      mutate(kcount = n())
+    
+    # I've tried to created a function using `JS`:
+    
+    highchart() %>%
+      hc_title(text = "Patient Status",
+               style = list(fontSize = "15px", fontWeight = "bold")) %>%
+      hc_subtitle(text = "Frequency of Occurences") %>%
+      hc_chart(type = "column") %>%
+      hc_plotOptions(column = list(stacking = "normal"))  %>%
+      hc_add_series(
+        data = indata,
+        animatio = list(duration = 1000,
+                        easing = easeOutBounce),
+        type = 'column',
+        hcaes(
+          x = unique(Subject.ID),
+          y = kcount,
+          group = Sample.Status,
+          fill = Sample.Status
+        )
+      ) %>%
+      hc_xAxis(
+        title = list(text = "Subjects"),
+        categories = indata$Subject.ID,
+        tickmarkPlacement = "on",
+        plotLines = list(list(label = list(rotation = 90)))
+      ) %>%
+      hc_yAxis(title = list(text = "Frequency"), offset = 10) %>%
+      # hc_tooltip(pointFormat = "<b> Freq: </b> {point.kcount}",shared = F)%>%
+      hc_add_theme(hc_theme_google()) %>%
+      hc_legend(reversed = TRUE) %>% hc_exporting(enabled = TRUE, # always enabled
+                                                  filename = "Intellia_Patient_Status")
+    
   })
   
+  
+  # observe({
+  #   print(dfr())
+  # })
+  # 
   output$reactab2 <- renderReactable({
+    library(dplyr)
+    indata <- dfr() %>% 
+      group_by(dfr()$`Subject.ID`)%>%
+      mutate(kcount = n())
     reactable(
-      dfr(),
+      indata,
       rownames = F,
       elementId = "cars-table2",
       showPageSizeOptions = TRUE,
@@ -723,6 +1011,86 @@ server <- function(input, output, session) {
     )
   })
   
+  
+  output$sreactab2 <- renderReactable({
+    library(dplyr)
+    indata <- dfr() %>% 
+      group_by(dfr()$`Subject.ID`)%>%
+      mutate(kcount = n())
+    reactable(
+      indata,
+      rownames = F,
+      elementId = "scars-table2",
+      showPageSizeOptions = TRUE,
+      selection = "multiple",
+      onClick = "select",
+      theme = theme <- reactableTheme(
+        style = list(".dark &" = list(
+          color = "#fff", background = "#282a36"
+        )),
+        cellStyle = list(
+          ".dark &" = list(
+            borderColor = "grey",
+            fontcolor = "white",
+            fontSize = "11px"
+          )
+          ,
+          ".light &" = list(
+            borderColor = "grey",
+            fontcolor = "black",
+            fontSize = "11px"
+          )
+        ),
+        headerStyle = list(
+          ".dark &" = list(borderColor = "grey", fontSize = "14px")
+          ,
+          ".light &" = list(borderColor = "grey", fontSize = "14px")
+        ),
+        paginationStyle = list(
+          ".dark &" = list(color = "black", borderColor = "rgba(255, 255, 255, 0.15)")
+        ),
+        rowHighlightStyle = list(
+          ".dark &" = list(background = "grey")
+          ,
+          ".light &" = list(background = "grey")
+        ),
+        pageButtonHoverStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.08)")),
+        pageButtonActiveStyle = list(".dark &" = list(background = "rgba(255, 255, 255, 0.1)"))
+      ),
+      paginationType = "jump",
+      striped = F,
+      resizable = TRUE,
+      showSortable = TRUE,
+      filterable = TRUE,
+      defaultColDef = colDef(
+        sortNALast = TRUE,
+        header = function(value)
+          gsub(".", " ", value, fixed = TRUE),
+        cell = function(value)
+          format(value, nsmall = 1),
+        # style = function(value) list(value,fontWeight = 20),
+        align = "center",
+        minWidth = 100
+        # ,headerStyle = list(background = "#f7f7f8",borderColor = "#555")
+      ),
+      
+      columns = list(
+        .rownames = colDef(
+          name = "Subject ID",
+          sortable = TRUE,
+          align = "left"
+        ),
+        character = colDef(
+          # Show species under character names
+          cell = function(value) {
+            div(div(style = "font-weight: 5", value))
+          }
+        )
+      ),
+      bordered = TRUE,
+      highlight = TRUE
+    )
+  })
   
   output$selected_row_details <- renderUI({
     selected <- getReactableState("reactab2", "selected")
