@@ -906,7 +906,7 @@ observeEvent(input$sp2,{
     ) %>% layout(
       title = "Patient Status",
       barmode = 'stack',
-      xaxis = list(title = "Subject ID's"),
+      xaxis = list(title = "Visit Site"),
       ## Order & label the x-axis
       yaxis = list(title = "Frequency of Occurences")
     )
