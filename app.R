@@ -348,12 +348,32 @@ ui <- dashboardPage(
         ,
         wellPanel(
           style = "align:center;background:white",
-          fluidRow(column(width=6, align = "center",
+          fluidRow(
+            column(width=4, align = "center",
+                   
+                   
+                   pickerInput(
+                     inputId = "sp4",
+                     label = "Select the Country",
+                     choices = NULL,
+                     selected = NULL,
+                     multiple = TRUE,
+                     options = list(
+                       `live-search` = TRUE,
+                       `actions-box` = TRUE,
+                       `deselect-all-text` = "Deselect All",
+                       `select-all-text` = "Select All",
+                       `none-selected-text` = "Select Country"
+                     )
+                   )
+            )
+            ,
+            column(width=4, align = "center",
 
 
                           pickerInput(
                             inputId = "sp2",
-                            label = "Select the Subjects",
+                            label = "Select the Visit Site",
                             choices = NULL,
                             selected = NULL,
                             multiple = TRUE,
@@ -362,12 +382,12 @@ ui <- dashboardPage(
                               `actions-box` = TRUE,
                               `deselect-all-text` = "Deselect All",
                               `select-all-text` = "Select All",
-                              `none-selected-text` = "Select Subjects"
+                              `none-selected-text` = "Select Visit Site"
                             )
                           )
           )
           ,
-          column(width=6, align = "center",
+          column(width=4, align = "center",
                  pickerInput(
                    inputId = "sp3",
                    label = "Select the Visit Name",
@@ -523,13 +543,23 @@ server <- function(input, output, session) {
   observe({
     updatePickerInput(
       session = session,
-      inputId = "sp2",
-      choices = unique(datafile()$`Subject.ID`),
+      inputId = "sp4",
+      choices = unique(datafile()$`Country`),
       selected = NULL
       
       )
     # print(input$sp2)
     # print(unique(datafile()[datafile()$`Subject.ID` %in% input$sp2,]$`Visit.Name`))
+  })
+  
+  observeEvent(input$sp4,{
+    
+    updatePickerInput(
+      session = session,
+      inputId = "sp2",
+      choices = unique(datafile()[datafile()$`Country` %in% input$sp4,]$`Site`),
+      selected = NULL
+    )
   })
 
 observeEvent(input$sp2,{
@@ -537,7 +567,7 @@ observeEvent(input$sp2,{
     updatePickerInput(
       session = session,
       inputId = "sp3",
-      choices = unique(datafile()[datafile()$`Subject.ID` %in% input$sp2,]$`Visit.Name`),
+      choices = unique(datafile()[datafile()$`Site` %in% input$sp2,]$`Visit.Name`),
       selected = NULL
     )
 })
@@ -856,7 +886,7 @@ observeEvent(input$sp2,{
     df$`Visit.Date`<-dmy(df$`Visit.Date`)
     
     df <-
-      df[df$`Subject.ID` %in% input$sp2 & df$`Visit.Name` %in% input$sp3, ]
+      df[df$`Site` %in% input$sp2 & df$`Visit.Name` %in% input$sp3, ]
     df <-df[df$`Visit.Date` >= input$smultiple1 & df$`Visit.Date` <= input$smultiple2, ]
     
     return(df)
