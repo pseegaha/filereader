@@ -911,9 +911,9 @@ observeEvent(input$sp2,{
     ) %>% layout(
       title = "Patient Status",
       barmode = 'stack',
-      xaxis = list(title = "Subject ID's"),
+      xaxis = list(title = "Subject ID's",categoryorder = "trace"),
       ## Order & label the x-axis
-      yaxis = list(title = "Frequency of Occurences")
+      yaxis = list(title = "Frequency of Occurences",tickformat=',d',dtick='1' )
     )
   })
   output$splotly_chart <- renderPlotly({
@@ -938,7 +938,7 @@ observeEvent(input$sp2,{
       barmode = 'stack',
       xaxis = list(title = "Visit Site"),
       ## Order & label the x-axis
-      yaxis = list(title = "Frequency of Occurences")
+      yaxis = list(title = "Frequency of Occurences",tickformat=',d',dtick='1' )
     )
   })
   
