@@ -893,9 +893,21 @@ observeEvent(input$sp2,{
   })
   output$plotly_chart <- renderPlotly({
     library(dplyr)
-    indata <- dfr() %>% 
-      group_by(dfr()$`Subject.ID`)%>%
+
+    
+    if (any(is.null(input$p2)))
+    {indata <- datafile()
+    # Remove duplicate rows
+    indata <-indata[!duplicated(indata), ]
+    indata$`Visit.Date`<-dmy(indata$`Visit.Date`)
+    indata<-indata %>% 
+      group_by(indata$`Site`)%>%
       mutate(kcount = n())
+    }else{
+      indata <- dfr() %>% 
+        group_by(dfr()$`Subject.ID`)%>%
+        mutate(kcount = n())
+    }
     
     # print(c(indata$`Subject.ID`,indata$kcount))
     plot_ly(
@@ -918,10 +930,20 @@ observeEvent(input$sp2,{
   })
   output$splotly_chart <- renderPlotly({
     library(dplyr)
+    
+    if (any(is.null(input$sp4)))
+     {indata <- datafile()
+    # Remove duplicate rows
+      indata <-indata[!duplicated(indata), ]
+      indata$`Visit.Date`<-dmy(indata$`Visit.Date`)
+      indata<-indata %>% 
+        group_by(indata$`Site`)%>%
+        mutate(kcount = n())
+      }else{
     indata <- sdfr() %>% 
       group_by(sdfr()$`Site`)%>%
       mutate(kcount = n())
-    
+      }
     # print(c(indata$`Subject.ID`,indata$kcount))
     plot_ly(
       indata,
@@ -1024,12 +1046,24 @@ observeEvent(input$sp2,{
   
   output$reactab2 <- renderReactable({
     library(dplyr)
-    indata <- dfr() %>%
-      filter(
-        dfr()$`Subject.ID` %in% ategory()
-      )%>% 
-      # group_by(dfr()$`Subject.ID`)%>%
-      mutate(kcount = n())
+    if (any(is.null(ategory())))
+    {
+      indata <- datafile()
+    # Remove duplicate rows
+    indata <-indata[!duplicated(indata), ]
+    indata$`Visit.Date`<-dmy(indata$`Visit.Date`)
+    # indata<-indata %>% 
+    #   group_by(indata$`Site`)%>%
+    #   mutate(kcount = n())
+    }else{
+      indata <- dfr() %>%
+        filter(
+          dfr()$`Subject.ID` %in% ategory()
+        )
+      # %>% 
+      #   # group_by(dfr()$`Subject.ID`)%>%
+      #   mutate(kcount = n())
+    }
     reactable(
       indata,
       rownames = F,
@@ -1108,12 +1142,24 @@ observeEvent(input$sp2,{
   
   output$sreactab2 <- renderReactable({
     library(dplyr)
+    if (any(is.null(sategory())))
+    {
+      indata <- datafile()
+      # Remove duplicate rows
+      indata <-indata[!duplicated(indata), ]
+      indata$`Visit.Date`<-dmy(indata$`Visit.Date`)
+      # indata<-indata %>% 
+      #   group_by(indata$`Site`)%>%
+      #   mutate(kcount = n())
+    }else{
     indata <- sdfr() %>% 
       filter(
         sdfr()$`Site` %in% sategory()
-      )%>% 
-      # group_by(sdfr()$`Subject.ID`)%>%
-      mutate(kcount = n())
+      )
+    # %>% 
+    #   # group_by(sdfr()$`Subject.ID`)%>%
+    #   mutate(kcount = n())
+    }
     reactable(
       indata,
       rownames = F,
