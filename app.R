@@ -1050,7 +1050,7 @@ observeEvent(input$sp2,{
     {
       indata <- datafile()
     # Remove duplicate rows
-    indata <-indata[!duplicated(indata), ]
+    # indata <-indata[!duplicated(indata), ]
     indata$`Visit.Date`<-dmy(indata$`Visit.Date`)
     # indata<-indata %>% 
     #   group_by(indata$`Site`)%>%
@@ -1146,7 +1146,7 @@ observeEvent(input$sp2,{
     {
       indata <- datafile()
       # Remove duplicate rows
-      indata <-indata[!duplicated(indata), ]
+      # indata <-indata[!duplicated(indata), ]
       indata$`Visit.Date`<-dmy(indata$`Visit.Date`)
       # indata<-indata %>% 
       #   group_by(indata$`Site`)%>%
