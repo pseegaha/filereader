@@ -952,6 +952,7 @@ observeEvent(input$sp2,{
       group =~`Sample.Status`,
       color =~`Sample.Status` ,
       type = 'bar',
+      text=~`kcount`,
       source = "sategory",
       hovertemplate = paste("<b>%{xaxis.title.text}:  %{x}</b><br>",
                             "%{yaxis.title.text}:  %{y}<br><extra></extra>")
